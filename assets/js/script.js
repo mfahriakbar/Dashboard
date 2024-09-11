@@ -113,55 +113,133 @@ for (let i = 0; i < filterBtn.length; i++) {
 
 }
 
+const apiURL = "https://itzpire.com/information/news-indonesia/antara/terbaru";
+        
 
-// contact form variables
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector("[data-form]");
-  const formInputs = document.querySelectorAll("[data-form-input]");
-  const formBtn = document.querySelector("[data-form-btn]");
+        // Fetch and display blog posts
+        fetch(apiURL)
+        .then(res => res.json())
+        .then(data => {
+            const blogPostsList = document.getElementById("blogPostsList");
+            blogPostsList.innerHTML = ''; // Clear any existing content
 
-  // add event to all form input fields
-  formInputs.forEach(input => {
-    input.addEventListener("input", () => {
-      // check form validation
-      formBtn.disabled = !form.checkValidity();
-    });
-  });
+            data.data.posts.forEach(post => {
+                const coverImg = post.thumbnail;
+                const judul = post.title;
+                const deskripsi = post.description;
+                const tanggal = post.pubDate;
+                const link = post.link;
 
-  // Function to send data to Telegram
-  function send() {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const pesan = document.getElementById("pesan").value;
-    
-    const gabungan = `nama%3A%0A${encodeURIComponent(name)}%0Aemail%3A%0A${encodeURIComponent(email)}%0Apesan%3A%0A${encodeURIComponent(pesan)}`;
-    
-    const token = '7339479583:AAGHoW-Zg271MeGR4cHPTGV-LL82z8Mg5jU';
-    const grup = '1898287814';
+                const li = document.createElement("li");
+                li.classList.add("blog-post-item");
 
-    fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${grup}&text=${gabungan}&parse_mode=html`, {
-      method: 'POST',
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.ok) {
-        console.log("Pesan berhasil dikirim!");
-      } else {
-        console.error("Gagal mengirim pesan:", data.description);
-      }
-    })
-    .catch(error => {
-      console.error("Terjadi kesalahan:", error);
-    });
-  }
+                const a = document.createElement("a");
+                a.href = link;
 
-  // Attach send function to the form submit event
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    send();
-  });
-});
+                const figure = document.createElement("figure");
+                figure.classList.add("blog-banner-box");
+                const img = document.createElement("img");
+                img.src = coverImg;
+                img.alt = judul;
+                img.loading = "lazy";
+                figure.appendChild(img);
 
+                const divContent = document.createElement("div");
+                divContent.classList.add("blog-content");
+
+                const divMeta = document.createElement("div");
+                divMeta.classList.add("blog-meta");
+                const categoryP = document.createElement("p");
+                categoryP.classList.add("blog-category");
+                categoryP.textContent = "News"; 
+                const dotSpan = document.createElement("span");
+                dotSpan.classList.add("dot");
+                const timeElement = document.createElement("time");
+                timeElement.dateTime = new Date(tanggal).toISOString();
+                timeElement.textContent = new Date(tanggal).toLocaleDateString();
+                divMeta.appendChild(categoryP);
+                divMeta.appendChild(dotSpan);
+                divMeta.appendChild(timeElement);
+
+                const h3 = document.createElement("h3");
+                h3.classList.add("h3");
+                h3.classList.add("blog-item-title");
+                h3.textContent = judul;
+
+                const p = document.createElement("p");
+                p.classList.add("blog-text");
+                p.textContent = deskripsi.length > 100 ? deskripsi.substring(0, 99) + "..." : deskripsi;
+
+                divContent.appendChild(divMeta);
+                divContent.appendChild(h3);
+                divContent.appendChild(p);
+
+                a.appendChild(figure);
+                a.appendChild(divContent);
+
+                li.appendChild(a);
+                blogPostsList.appendChild(li);
+            });
+        });
+
+       
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+          const form = document.querySelector("[data-form]");
+          const formInputs = document.querySelectorAll("[data-form-input]");
+          const formBtn = document.querySelector("[data-form-btn]");
+        
+          // add event to all form input fields
+          formInputs.forEach(input => {
+            input.addEventListener("input", () => {
+              // check form validation
+              formBtn.disabled = !form.checkValidity();
+            });
+          });
+        
+          // Function to send data to Telegram
+          function send() {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const pesan = document.getElementById("pesan").value;
+            
+            const gabungan = `nama%3A%0A${encodeURIComponent(name)}%0Aemail%3A%0A${encodeURIComponent(email)}%0Apesan%3A%0A${encodeURIComponent(pesan)}`;
+            
+            const token = '7339479583:AAGHoW-Zg271MeGR4cHPTGV-LL82z8Mg5jU';
+            const grup = '1898287814';
+        
+            return fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${grup}&text=${gabungan}&parse_mode=html`, {
+              method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.ok) {
+                console.log("Pesan berhasil dikirim!");
+                return true; // Indicate success
+              } else {
+                console.error("Gagal mengirim pesan:", data.description);
+                return false; // Indicate failure
+              }
+            })
+            .catch(error => {
+              console.error("Terjadi kesalahan:", error);
+              return false; // Indicate failure
+            });
+          }
+        
+          // Handle form submission
+          form.addEventListener("submit", (event) => {
+            event.preventDefault(); // Prevent the default form submission
+        
+            send().then(success => {
+              if (success) {
+                form.reset(); // Reset the form if the message was sent successfully
+              }
+            });
+          });
+        });
+        
 
 
 
