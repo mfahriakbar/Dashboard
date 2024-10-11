@@ -204,11 +204,7 @@ const apiURL = "https://itzpire.com/information/news-indonesia/antara/terbaru";
             const email = document.getElementById("email").value;
             const pesan = document.getElementById("pesan").value;
             
-            const gabungan = `nama%3A%0A${encodeURIComponent(name)}%0Aemail%3A%0A${encodeURIComponent(email)}%0Apesan%3A%0A${encodeURIComponent(pesan)}`;
             
-            const token = '7339479583:AAGHoW-Zg271MeGR4cHPTGV-LL82z8Mg5jU';
-            const grup = '1898287814';
-        
             return fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${grup}&text=${gabungan}&parse_mode=html`, {
               method: 'POST',
             })
